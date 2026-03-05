@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3 class="mb-3">Company Dashboard</h3>
+<div class="card mb-3">
+  <div class="card-body">
+    <h5 class="card-title">{{ company.company_name }}</h5>
+    <p class="mb-1"><strong>HR Contact:</strong> {{ company.hr_contact_name }} ({{ company.hr_contact_email }})</p>
+    <p class="mb-0"><strong>Website:</strong> {{ company.website or '-' }}</p>
+  </div>
+</div>
+<div class="d-flex justify-content-between align-items-center mb-2">
+  <h5 class="mb-0">Your Placement Drives</h5>
+  <a href="{{ url_for('company.create_drive') }}" class="btn btn-primary btn-sm">Create New Drive</a>
+</div>
+<table class="table table-striped table-bordered">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Job Title</th>
+      <th>Min CGPA</th>
+      <th>Deadline</th>
+      <th>Status</th>
+      <th>Applicants</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for drive in drives %}
+    <tr>
+      <td>{{ drive.id }}</td>
+      <td>{{ drive.job_title }}</td>
+      <td>{{ drive.min_cgpa }}</td>
+      <td>{{ drive.deadline }}</td>
+      <td>{{ drive.status }}</td>
+      <td>{{ drive_applicants.get(drive.id, 0) }}</td>
+      <td>
+        <a href="{{ url_for('company.edit_drive', drive_id=drive.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+        <a href="{{ url_for('company.view_applications', drive_id=drive.id) }}" class="btn btn-sm btn-outline-info">Applications</a>
+        {% if drive.status != 'Closed' %}
+        <form method="post" action="{{ url_for('company.close_drive', drive_id=drive.id) }}" class="d-inline">
+          <button type="submit" class="btn btn-sm btn-outline-danger">Close</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+

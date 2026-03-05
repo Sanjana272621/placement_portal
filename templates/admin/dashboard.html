@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3 class="mb-4">Admin Dashboard</h3>
+<div class="row">
+  <div class="col-md-3">
+    <div class="card text-bg-primary">
+      <div class="card-body">
+        <h5 class="card-title">Students</h5>
+        <p class="display-6">{{ total_students }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-bg-success">
+      <div class="card-body">
+        <h5 class="card-title">Companies</h5>
+        <p class="display-6">{{ total_companies }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-bg-info">
+      <div class="card-body">
+        <h5 class="card-title">Drives</h5>
+        <p class="display-6">{{ total_drives }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-bg-warning">
+      <div class="card-body">
+        <h5 class="card-title">Applications</h5>
+        <p class="display-6">{{ total_applications }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="mt-4">
+  <a href="{{ url_for('admin.students') }}" class="btn btn-outline-primary me-2">View Students</a>
+  <a href="{{ url_for('admin.companies') }}" class="btn btn-outline-success me-2">View Companies</a>
+  <a href="{{ url_for('admin.drives') }}" class="btn btn-outline-info me-2">View Drives</a>
+  <a href="{{ url_for('admin.applications') }}" class="btn btn-outline-warning">View Applications</a>
+</div>
+{% endblock %}
+

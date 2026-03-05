@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3 class="mb-3">My Applications</h3>
+<table class="table table-striped table-bordered">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Company</th>
+      <th>Job Title</th>
+      <th>Applied At</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for application in applications %}
+    <tr>
+      <td>{{ application.id }}</td>
+      <td>{{ application.drive.company.company_name }}</td>
+      <td>{{ application.drive.job_title }}</td>
+      <td>{{ application.applied_at }}</td>
+      <td>{{ application.status }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+<a href="{{ url_for('student.dashboard') }}" class="btn btn-secondary mt-2">Back to Dashboard</a>
+{% endblock %}
+

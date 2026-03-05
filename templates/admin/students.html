@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3 class="mb-3">Students</h3>
+<form class="row g-2 mb-3" method="get">
+  <div class="col-md-5">
+    <input type="text" name="search" value="{{ search }}" placeholder="Search by name, roll no, or phone" class="form-control">
+  </div>
+  <div class="col-md-2">
+    <button class="btn btn-primary">Search</button>
+  </div>
+</form>
+<table class="table table-striped table-bordered">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Roll No</th>
+      <th>Phone</th>
+      <th>Department</th>
+      <th>CGPA</th>
+      <th>Batch</th>
+      <th>Account</th>
+      <th>Resume</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for student in students %}
+    <tr>
+      <td>{{ student.id }}</td>
+      <td>{{ student.name }}</td>
+      <td>{{ student.roll_no }}</td>
+      <td>{{ student.phone }}</td>
+      <td>{{ student.department }}</td>
+      <td>{{ '%.2f'|format(student.cgpa) }}</td>
+      <td>{{ student.batch_year }}</td>
+      <td>{% if student.user.is_active %}Active{% else %}Inactive{% endif %}</td>
+      <td>
+        {% if student.resume_filename %}
+          <a href="{{ url_for('static', filename='resumes/' ~ student.resume_filename) }}" target="_blank">View</a>
+        {% else %}
+          -
+        {% endif %}
+      </td>
+      <td>
+        <form method="post" action="{{ url_for('admin.toggle_user_active', user_id=student.id) }}">
+          <button type="submit" class="btn btn-sm btn-outline-danger">
+            {% if student.user.is_active %}Deactivate{% else %}Activate{% endif %}
+          </button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
