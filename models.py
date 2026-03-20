@@ -95,7 +95,21 @@ class Application(db.Model):
         ),
     )
 
+class Placement(db.Model):
+    __tablename__ = "placements"
 
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey("students.id"), nullable=False)
+    application_id = db.Column(db.Integer, db.ForeignKey("applications.id"), unique=True, nullable=False)
+
+    company_name = db.Column(db.String(150), nullable=False)
+    job_title = db.Column(db.String(150), nullable=False)
+    package = db.Column(db.Float)
+    placed_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    student = db.relationship("Student", backref="placements")
+    application = db.relationship("Application", backref=db.backref("placement", uselist=False))
+    
 def seed_default_admin():
     """Create a default admin user if it does not exist."""
     admin_email = "admin@institute.edu"
