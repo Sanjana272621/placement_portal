@@ -53,7 +53,9 @@ class Company(db.Model):
     company_name = db.Column(db.String(150), nullable=False)
     hr_contact_name = db.Column(db.String(120), nullable=False)
     hr_contact_email = db.Column(db.String(120), nullable=False)
+    hr_contact_phone = db.Column(db.String(20))
     website = db.Column(db.String(255))
+    industry = db.Column(db.String(100))
     approval_status = db.Column(db.String(20), default="Pending")  # Pending / Approved / Rejected
 
     drives = db.relationship("PlacementDrive", backref="company", lazy=True)
