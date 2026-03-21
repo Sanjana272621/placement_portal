@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Applications</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Student</th>
+            <th>Drive</th>
+            <th>Company</th>
+            <th>Applied At</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for app in applications %}
+        <tr>
+            <td>{{ app.student.name }}</td>
+            <td>{{ app.drive.job_title }}</td>
+            <td>{{ app.drive.company.company_name }}</td>
+            <td>{{ app.applied_at }}</td>
+            <td>{{ app.status }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

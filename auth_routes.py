@@ -136,7 +136,7 @@ def register_company():
 
 def redirect_by_role(user):
     if user.role == "admin":
-        return redirect(url_for("admin_dashboard"))
+        return redirect(url_for("admin.dashboard"))
     if user.role == "student":
         return redirect(url_for("student_dashboard"))
     if user.role == "company":

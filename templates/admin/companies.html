@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Companies</h2>
+
+<form method="GET" class="mb-3 d-flex gap-2">
+    <input type="text" name="q" class="form-control" placeholder="Search by company name or industry" value="{{ q }}">
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Company</th>
+            <th>Industry</th>
+            <th>HR Contact</th>
+            <th>Approval Status</th>
+            <th>Active</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for company in companies %}
+        <tr>
+            <td>{{ company.company_name }}</td>
+            <td>{{ company.industry or "-" }}</td>
+            <td>{{ company.hr_contact_name }}</td>
+            <td>{{ company.approval_status }}</td>
+            <td>{{ "Yes" if company.user.is_active else "No" }}</td>
+            <td class="d-flex gap-2">
+                <form method="POST" action="{{ url_for('admin.approve_company', company_id=company.id) }}">
+                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                </form>
+                <form method="POST" action="{{ url_for('admin.reject_company', company_id=company.id) }}">
+                    <button type="submit" class="btn btn-warning btn-sm">Reject</button>
+                </form>
+                <form method="POST" action="{{ url_for('admin.deactivate_company', company_id=company.id) }}">
+                    <button type="submit" class="btn btn-danger btn-sm">Deactivate</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -6,6 +6,7 @@ from flask_login import login_required, current_user
 from extensions import db, login_manager
 from models import seed_default_admin
 from auth_routes import auth_bp
+from admin_routes import admin_bp
 
 
 def create_app():
@@ -25,17 +26,11 @@ def create_app():
         seed_default_admin()
 
     app.register_blueprint(auth_bp)
+    app.register_blueprint(admin_bp)
 
     @app.route("/")
     def home():
         return render_template("home.html")
-
-    @app.route("/admin/dashboard")
-    @login_required
-    def admin_dashboard():
-        if current_user.role != "admin":
-            return "Access denied", 403
-        return render_template("admin_dashboard.html")
 
     @app.route("/student/dashboard")
     @login_required
