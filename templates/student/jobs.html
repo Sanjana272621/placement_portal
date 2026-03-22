@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Browse Approved Jobs</h2>
+
+<form method="GET" class="mb-3 d-flex gap-2">
+    <input type="text" name="q" class="form-control" placeholder="Search by company, title, or skills" value="{{ q }}">
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Job Title</th>
+            <th>Company</th>
+            <th>Skills</th>
+            <th>Min CGPA</th>
+            <th>Deadline</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for drive in drives %}
+        <tr>
+            <td>{{ drive.job_title }}</td>
+            <td>{{ drive.company.company_name }}</td>
+            <td>{{ drive.required_skills or "-" }}</td>
+            <td>{{ drive.min_cgpa }}</td>
+            <td>{{ drive.deadline }}</td>
+            <td>
+                <form method="POST" action="{{ url_for('student.apply', drive_id=drive.id) }}">
+                    <button type="submit" class="btn btn-success btn-sm">Apply</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

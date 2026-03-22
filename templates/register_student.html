@@ -2,7 +2,7 @@
 
 {% block content %}
 <h2>Student Registration</h2>
-<form method="POST" class="w-75">
+<form method="POST" enctype="multipart/form-data" class="w-75">
     <div class="row">
         <div class="col-md-6 mb-3">
             <label>Name</label>
@@ -35,6 +35,10 @@
         <div class="col-md-6 mb-3">
             <label>Batch Year</label>
             <input type="number" name="batch_year" class="form-control" required>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label>Resume</label>
+            <input type="file" name="resume" class="form-control">
         </div>
     </div>
     <button type="submit" class="btn btn-success">Register</button>

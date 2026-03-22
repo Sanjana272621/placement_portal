@@ -1,3 +1,7 @@
+import os
+from werkzeug.utils import secure_filename
+from flask import current_app
+
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 
@@ -50,7 +54,6 @@ def logout():
     flash("Logged out successfully.", "info")
     return redirect(url_for("auth.login"))
 
-
 @auth_bp.route("/register/student", methods=["GET", "POST"])
 def register_student():
     if request.method == "POST":
@@ -71,6 +74,15 @@ def register_student():
             flash("Roll number already exists.", "danger")
             return render_template("register_student.html")
 
+        resume_filename = None
+        resume = request.files.get("resume")
+        if resume and resume.filename:
+            filename = secure_filename(resume.filename)
+            upload_folder = os.path.join(current_app.root_path, "static", "uploads", "resumes")
+            os.makedirs(upload_folder, exist_ok=True)
+            resume.save(os.path.join(upload_folder, filename))
+            resume_filename = filename
+
         user = User(email=email, role="student", is_active=True)
         user.set_password(password)
         db.session.add(user)
@@ -84,6 +96,7 @@ def register_student():
             department=department,
             cgpa=float(cgpa),
             batch_year=int(batch_year),
+            resume_filename=resume_filename,
         )
         db.session.add(student)
         db.session.commit()
@@ -92,7 +105,6 @@ def register_student():
         return redirect(url_for("auth.login"))
 
     return render_template("register_student.html")
-
 
 @auth_bp.route("/register/company", methods=["GET", "POST"])
 def register_company():

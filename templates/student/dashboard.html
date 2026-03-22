@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Student Dashboard</h2>
+
+<h4 class="mt-4">Approved Placement Drives</h4>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Job Title</th>
+            <th>Company</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for drive in approved_drives %}
+        <tr>
+            <td>{{ drive.job_title }}</td>
+            <td>{{ drive.company.company_name }}</td>
+            <td>{{ drive.status }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h4 class="mt-4">My Applications</h4>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Job Title</th>
+            <th>Company</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for app in my_applications %}
+        <tr>
+            <td>{{ app.drive.job_title }}</td>
+            <td>{{ app.drive.company.company_name }}</td>
+            <td>{{ app.status }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="mt-3">
+    <a href="{{ url_for('student.profile') }}" class="btn btn-primary">Edit Profile</a>
+    <a href="{{ url_for('student.jobs') }}" class="btn btn-success">Browse Jobs</a>
+    <a href="{{ url_for('student.my_applications') }}" class="btn btn-info">My Applications</a>
+</div>
+{% endblock %}
