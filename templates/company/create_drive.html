@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Create Placement Drive</h2>
+
+<form method="POST">
+    <div class="mb-3">
+        <label>Job Title</label>
+        <input type="text" name="job_title" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Job Description</label>
+        <textarea name="job_description" class="form-control" required></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label>Eligibility Criteria</label>
+        <textarea name="eligibility_criteria" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label>Required Skills</label>
+        <textarea name="required_skills" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label>Experience Required</label>
+        <input type="text" name="experience_required" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label>Salary Range</label>
+        <input type="text" name="salary_range" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label>Minimum CGPA</label>
+        <input type="number" step="0.01" name="min_cgpa" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Application Deadline</label>
+        <input type="date" name="deadline" class="form-control" required>
+    </div>
+
+    <button type="submit" class="btn btn-success">Create Drive</button>
+</form>
+{% endblock %}

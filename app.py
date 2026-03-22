@@ -7,7 +7,7 @@ from extensions import db, login_manager
 from models import seed_default_admin
 from auth_routes import auth_bp
 from admin_routes import admin_bp
-
+from company_routes import company_bp
 
 def create_app():
     app = Flask(__name__)
@@ -27,6 +27,7 @@ def create_app():
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(company_bp)
 
     @app.route("/")
     def home():
@@ -38,13 +39,6 @@ def create_app():
         if current_user.role != "student":
             return "Access denied", 403
         return render_template("student_dashboard.html")
-
-    @app.route("/company/dashboard")
-    @login_required
-    def company_dashboard():
-        if current_user.role != "company":
-            return "Access denied", 403
-        return render_template("company_dashboard.html")
 
     return app
 

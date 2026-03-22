@@ -74,7 +74,9 @@ class PlacementDrive(db.Model):
     status = db.Column(
         db.String(20), default="Pending"
     )  # Pending / Approved / Closed / Rejected
-
+    required_skills = db.Column(db.Text)
+    experience_required = db.Column(db.String(100))
+    salary_range = db.Column(db.String(100))
     applications = db.relationship("Application", backref="drive", lazy=True)
 
 
