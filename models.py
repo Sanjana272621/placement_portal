@@ -99,6 +99,32 @@ class Application(db.Model):
         ),
     )
 
+
+class ApplicationStatusHistory(db.Model):
+    """
+    Records every status transition for a student application.
+
+    We keep the current status on `Application.status` for quick reads,
+    and append transitions here for a complete audit trail.
+    """
+
+    __tablename__ = "application_status_history"
+
+    id = db.Column(db.Integer, primary_key=True)
+    application_id = db.Column(
+        db.Integer, db.ForeignKey("applications.id"), nullable=False, index=True
+    )
+    from_status = db.Column(db.String(20))
+    to_status = db.Column(db.String(20), nullable=False)
+    changed_by_user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    changed_by_role = db.Column(db.String(20))  # admin / company / student
+    changed_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+
+    application = db.relationship(
+        "Application", backref=db.backref("status_history", lazy=True)
+    )
+
+
 class Placement(db.Model):
     __tablename__ = "placements"
 
@@ -114,6 +140,17 @@ class Placement(db.Model):
     student = db.relationship("Student", backref="placements")
     application = db.relationship("Application", backref=db.backref("placement", uselist=False))
     
+
+class Notification(db.Model):
+    __tablename__ = "notifications"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
+    message = db.Column(db.String(400), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    read_at = db.Column(db.DateTime, nullable=True)
+
+
 def seed_default_admin():
     """Create a default admin user if it does not exist."""
     admin_email = "admin@institute.edu"

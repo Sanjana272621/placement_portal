@@ -2,7 +2,14 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 
 from extensions import db
-from models import Company, PlacementDrive, Application, Student
+from models import (
+    Company,
+    PlacementDrive,
+    Application,
+    Student,
+    ApplicationStatusHistory,
+    Notification,
+)
 
 company_bp = Blueprint("company", __name__, url_prefix="/company")
 
@@ -139,7 +146,51 @@ def update_application_status(application_id):
         flash("Invalid status.", "danger")
         return redirect(url_for("company.drive_applications", drive_id=application.drive_id))
 
+    from_status = application.status
+
+    # Backfill: if this application has no history yet (apps created before this milestone),
+    # store the current status as the first timeline entry.
+    if not ApplicationStatusHistory.query.filter_by(application_id=application.id).first():
+        db.session.add(
+            ApplicationStatusHistory(
+                application_id=application.id,
+                from_status=None,
+                to_status=from_status,
+                changed_by_user_id=None,
+                changed_by_role="system",
+            )
+        )
+
     application.status = new_status
+
+    # Persist the transition for a complete application history.
+    db.session.add(
+        ApplicationStatusHistory(
+            application_id=application.id,
+            from_status=from_status,
+            to_status=new_status,
+            changed_by_user_id=current_user.id,
+            changed_by_role=current_user.role,
+        )
+    )
+
+    # Notify the student about the status update.
+    drive = application.drive
+    company_name = drive.company.company_name
+    job_title = drive.job_title
+    if new_status == "Shortlisted":
+        message = f"Your application for '{job_title}' at {company_name} has been shortlisted."
+    elif new_status == "Selected":
+        message = f"Your application for '{job_title}' at {company_name} has been selected."
+    else:  # Rejected
+        message = f"Your application for '{job_title}' at {company_name} has been rejected."
+
+    db.session.add(
+        Notification(
+            user_id=application.student_id,
+            message=message,
+        )
+    )
     db.session.commit()
     flash("Application status updated.", "success")
     return redirect(url_for("company.drive_applications", drive_id=application.drive_id))
@@ -150,3 +201,25 @@ def update_application_status(application_id):
 def student_profile(student_id):
     student = Student.query.get_or_404(student_id)
     return render_template("company/applicant_profile.html", student=student)
+
+
+@company_bp.route("/applications/<int:application_id>/history")
+@login_required
+def application_history(application_id: int):
+    application = Application.query.get_or_404(application_id)
+    if application.drive.company_id != current_user.id:
+        return "Access denied", 403
+
+    history = (
+        ApplicationStatusHistory.query.filter_by(application_id=application.id)
+        .order_by(ApplicationStatusHistory.changed_at.asc())
+        .all()
+    )
+    placement = getattr(application, "placement", None)
+
+    return render_template(
+        "company/application_history.html",
+        application=application,
+        history=history,
+        placement=placement,
+    )

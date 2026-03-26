@@ -23,6 +23,20 @@
     </tbody>
 </table>
 
+<h4 class="mt-4">Notifications</h4>
+{% if notifications %}
+<form method="POST" action="{{ url_for('student.mark_notifications_all_read') }}" class="mb-3">
+    <button type="submit" class="btn btn-sm btn-secondary">Mark all as read</button>
+</form>
+{% for n in notifications %}
+<div class="alert alert-info">
+    {{ n.message }}
+</div>
+{% endfor %}
+{% else %}
+<p>No new notifications.</p>
+{% endif %}
+
 <h4 class="mt-4">My Applications</h4>
 <table class="table table-bordered">
     <thead>

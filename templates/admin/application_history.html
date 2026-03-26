@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Application Status History</h2>
+
+<div class="card p-3 mb-3">
+    <p><strong>Job Title:</strong> {{ application.drive.job_title }}</p>
+    <p><strong>Company:</strong> {{ application.drive.company.company_name }}</p>
+    <p><strong>Student:</strong> {{ application.student.name }} ({{ application.student.roll_no }})</p>
+    <p><strong>Applied At:</strong> {{ application.applied_at }}</p>
+    <p><strong>Current Status:</strong> {{ application.status }}</p>
+</div>
+
+{% if placement %}
+<div class="alert alert-success">
+    Placed at: {{ placement.placed_at }}{% if placement.package %} | Package: {{ placement.package }}{% endif %}
+</div>
+{% endif %}
+
+<h4>Status Timeline</h4>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>From</th>
+            <th>To</th>
+            <th>Changed At</th>
+            <th>Changed By</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for h in history %}
+        <tr>
+            <td>{{ h.from_status or "-" }}</td>
+            <td>{{ h.to_status }}</td>
+            <td>{{ h.changed_at }}</td>
+            <td>{{ h.changed_by_role or "-" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{{ url_for('admin.applications') }}" class="btn btn-secondary">Back to Applications</a>
+{% endblock %}
+

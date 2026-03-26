@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from werkzeug.utils import secure_filename
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
@@ -6,7 +7,15 @@ from flask_login import login_required, current_user
 from sqlalchemy import or_
 
 from extensions import db
-from models import Student, PlacementDrive, Application, Company
+from models import (
+    Student,
+    PlacementDrive,
+    Application,
+    Company,
+    ApplicationStatusHistory,
+    Notification,
+    Placement,
+)
 
 student_bp = Blueprint("student", __name__, url_prefix="/student")
 
@@ -36,10 +45,17 @@ def dashboard():
         .all()
     )
 
+    notifications = (
+        Notification.query.filter_by(user_id=current_user.id, read_at=None)
+        .order_by(Notification.created_at.desc())
+        .all()
+    )
+
     return render_template(
         "student/dashboard.html",
         approved_drives=approved_drives,
         my_applications=my_applications,
+        notifications=notifications,
     )
 
 
@@ -115,6 +131,18 @@ def apply(drive_id):
     )
 
     db.session.add(application)
+    db.session.flush()  # Get application.id before writing status history
+
+    # Record the initial "Applied" state for the application's history trail.
+    db.session.add(
+        ApplicationStatusHistory(
+            application_id=application.id,
+            from_status=None,
+            to_status="Applied",
+            changed_by_user_id=current_user.id,
+            changed_by_role=current_user.role,
+        )
+    )
     db.session.commit()
 
     flash("Application submitted successfully.", "success")
@@ -130,3 +158,39 @@ def my_applications():
         .all()
     )
     return render_template("student/my_applications.html", applications=applications)
+
+
+@student_bp.route("/applications/<int:application_id>/history")
+@login_required
+def application_history(application_id: int):
+    application = Application.query.get_or_404(application_id)
+
+    if application.student_id != current_user.id:
+        return "Access denied", 403
+
+    history = (
+        ApplicationStatusHistory.query.filter_by(application_id=application.id)
+        .order_by(ApplicationStatusHistory.changed_at.asc())
+        .all()
+    )
+
+    # Relationship is defined from Placement.application_id via backref="placement"
+    placement = getattr(application, "placement", None)
+
+    return render_template(
+        "student/application_history.html",
+        application=application,
+        history=history,
+        placement=placement,
+    )
+
+
+@student_bp.route("/notifications/mark-all-read", methods=["POST"])
+@login_required
+def mark_notifications_all_read():
+    Notification.query.filter_by(user_id=current_user.id, read_at=None).update(
+        {"read_at": datetime.utcnow()}
+    )
+    db.session.commit()
+    flash("Notifications marked as read.", "success")
+    return redirect(url_for("student.dashboard"))

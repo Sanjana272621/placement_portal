@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Applicant Profile</h2>
+
+<div class="card p-3 mb-3">
+    <p><strong>Name:</strong> {{ student.name }}</p>
+    <p><strong>Roll No:</strong> {{ student.roll_no }}</p>
+    <p><strong>Phone:</strong> {{ student.phone }}</p>
+    <p><strong>Department:</strong> {{ student.department }}</p>
+    <p><strong>CGPA:</strong> {{ student.cgpa }}</p>
+    <p><strong>Batch Year:</strong> {{ student.batch_year }}</p>
+</div>
+
+{% if student.resume_filename %}
+<div class="alert alert-info">
+    <strong>Resume:</strong>
+    <a href="{{ url_for('static', filename='uploads/resumes/' ~ student.resume_filename) }}" target="_blank" rel="noopener">
+        View/Download
+    </a>
+</div>
+{% else %}
+<div class="alert alert-secondary">No resume uploaded.</div>
+{% endif %}
+
+<a href="{{ url_for('company.dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+{% endblock %}
+

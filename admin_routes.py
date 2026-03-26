@@ -3,7 +3,16 @@ from flask_login import login_required, current_user
 from sqlalchemy import or_
 
 from extensions import db
-from models import User, Student, Company, PlacementDrive, Application
+from models import (
+    User,
+    Student,
+    Company,
+    PlacementDrive,
+    Application,
+    ApplicationStatusHistory,
+    Notification,
+    Placement,
+)
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -144,3 +153,103 @@ def deactivate_company(company_id):
     db.session.commit()
     flash(f"{company.company_name} has been deactivated.", "warning")
     return redirect(url_for("admin.companies"))
+
+
+@admin_bp.route("/applications/<int:application_id>/history")
+@login_required
+def application_history(application_id: int):
+    application = Application.query.get_or_404(application_id)
+    history = (
+        ApplicationStatusHistory.query.filter_by(application_id=application.id)
+        .order_by(ApplicationStatusHistory.changed_at.asc())
+        .all()
+    )
+    placement = getattr(application, "placement", None)
+
+    return render_template(
+        "admin/application_history.html",
+        application=application,
+        history=history,
+        placement=placement,
+    )
+
+
+@admin_bp.route("/applications/<int:application_id>/set-status", methods=["POST"])
+@login_required
+def set_application_status(application_id: int):
+    application = Application.query.get_or_404(application_id)
+
+    new_status = request.form.get("status", "").strip()
+    allowed_statuses = ["Interview", "Placed", "Rejected"]
+    if new_status not in allowed_statuses:
+        flash("Invalid status.", "danger")
+        return redirect(url_for("admin.applications"))
+
+    from_status = application.status
+
+    # Backfill: if this application has no history yet (apps created before this milestone),
+    # store the current status as the first timeline entry.
+    if not ApplicationStatusHistory.query.filter_by(application_id=application.id).first():
+        db.session.add(
+            ApplicationStatusHistory(
+                application_id=application.id,
+                from_status=None,
+                to_status=from_status,
+                changed_by_user_id=None,
+                changed_by_role="system",
+            )
+        )
+
+    application.status = new_status
+
+    db.session.add(
+        ApplicationStatusHistory(
+            application_id=application.id,
+            from_status=from_status,
+            to_status=new_status,
+            changed_by_user_id=current_user.id,
+            changed_by_role=current_user.role,
+        )
+    )
+
+    drive = application.drive
+    company_name = drive.company.company_name
+    job_title = drive.job_title
+
+    if new_status == "Interview":
+        message = f"Your application for '{job_title}' at {company_name} is marked for interview."
+    elif new_status == "Placed":
+        message = f"Congratulations! You have been placed for '{job_title}' at {company_name}."
+    else:  # Rejected
+        message = f"Your application for '{job_title}' at {company_name} has been rejected."
+
+    db.session.add(
+        Notification(
+            user_id=application.student_id,
+            message=message,
+        )
+    )
+
+    # If the application becomes "Placed", create/update a placement record.
+    if new_status == "Placed":
+        existing = Placement.query.filter_by(application_id=application.id).first()
+        package_raw = request.form.get("package", "").strip()
+        package = float(package_raw) if package_raw else None
+
+        if existing:
+            existing.package = package
+            existing.placed_at = existing.placed_at or db.func.now()
+        else:
+            db.session.add(
+                Placement(
+                    student_id=application.student_id,
+                    application_id=application.id,
+                    company_name=company_name,
+                    job_title=job_title,
+                    package=package,
+                )
+            )
+
+    db.session.commit()
+    flash("Application status updated.", "success")
+    return redirect(url_for("admin.applications"))

@@ -10,6 +10,7 @@
             <th>Company</th>
             <th>Applied At</th>
             <th>Status</th>
+            <th>History</th>
         </tr>
     </thead>
     <tbody>
@@ -19,6 +20,11 @@
             <td>{{ app.drive.company.company_name }}</td>
             <td>{{ app.applied_at }}</td>
             <td>{{ app.status }}</td>
+            <td>
+                <a class="btn btn-sm btn-info" href="{{ url_for('student.application_history', application_id=app.id) }}">
+                    View History
+                </a>
+            </td>
         </tr>
         {% endfor %}
     </tbody>
