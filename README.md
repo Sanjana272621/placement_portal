@@ -38,6 +38,47 @@ A role-based web application built using Flask to manage campus recruitment acti
 * **Database:** SQLite (created programmatically using SQLAlchemy)
 * **Authentication:** Flask-Login
 
+### Setup Instructions
+* Clone the repository
+
+```bash
+git clone https://github.com/Sanjana272621/placement_portal.git
+cd placement_portal
+```
+
+* Create virtual environment (optional but recommended)
+
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
+
+* Install dependencies
+
+```bash
+pip install flask flask_sqlalchemy flask_login
+```
+
+* Run the application
+
+```bash
+python app.py
+```
+
+* Open in browser
+
+```bash
+http://127.0.0.1:5000/
+```
+
+### Report
+Detailed explanation of system design, database schema, and implementation.  
+https://docs.google.com/document/d/1Fd5pvddSO78RtwDJQsBrbOlcf2MFoo-AJtVIQiu7h_Y/edit?usp=sharing
+
+### Demo Video 
+A 5 minute walkthrough demonstrating all features and internal working.  
+https://drive.google.com/file/d/1s0HxYgOKgQdc3xBVVrK0FEVgWb2Zn58q/view?usp=sharing
+
 ### Author
 
 Sanjana S

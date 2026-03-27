@@ -150,7 +150,7 @@ def redirect_by_role(user):
     if user.role == "admin":
         return redirect(url_for("admin.dashboard"))
     if user.role == "student":
-        return redirect(url_for("student_dashboard"))
+        return redirect(url_for("student.dashboard"))
     if user.role == "company":
         return redirect(url_for("company.dashboard"))
     return redirect(url_for("auth.login"))

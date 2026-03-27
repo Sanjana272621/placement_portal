@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Manage Drives{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Placement Drives</h2>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <table class="table table-bordered table-hover mt-3">
+    <thead class="table-dark">
+      <tr>
+        <th>#</th>
+        <th>Company</th>
+        <th>Job Title</th>
+        <th>Min CGPA</th>
+        <th>Deadline</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for drive in drives %}
+      <tr>
+        <td>{{ drive.id }}</td>
+        <td>{{ drive.company.company_name }}</td>
+        <td>{{ drive.job_title }}</td>
+        <td>{{ drive.min_cgpa }}</td>
+        <td>{{ drive.deadline }}</td>
+        <td>
+          <span class="badge 
+            {% if drive.status == 'Approved' %}bg-success
+            {% elif drive.status == 'Rejected' %}bg-danger
+            {% elif drive.status == 'Closed' %}bg-secondary
+            {% else %}bg-warning text-dark{% endif %}">
+            {{ drive.status }}
+          </span>
+        </td>
+        <td>
+          {% if drive.status == 'Pending' %}
+            <form method="POST" action="{{ url_for('admin.approve_drive', drive_id=drive.id) }}" class="d-inline">
+              <button type="submit" class="btn btn-sm btn-success">Approve</button>
+            </form>
+            <form method="POST" action="{{ url_for('admin.reject_drive', drive_id=drive.id) }}" class="d-inline">
+              <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+            </form>
+          {% else %}
+            <span class="text-muted">—</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7" class="text-center">No drives found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

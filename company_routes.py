@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
+from datetime import date
 
 from extensions import db
 from models import (
@@ -54,7 +55,7 @@ def create_drive():
         job_description = request.form.get("job_description", "").strip()
         eligibility_criteria = request.form.get("eligibility_criteria", "").strip()
         min_cgpa = request.form.get("min_cgpa", "").strip()
-        deadline = request.form.get("deadline", "").strip()
+        deadline = date.fromisoformat(request.form.get("deadline", "").strip())
         required_skills = request.form.get("required_skills", "").strip()
         experience_required = request.form.get("experience_required", "").strip()
         salary_range = request.form.get("salary_range", "").strip()
@@ -93,7 +94,7 @@ def edit_drive(drive_id):
         drive.job_description = request.form.get("job_description", "").strip()
         drive.eligibility_criteria = request.form.get("eligibility_criteria", "").strip()
         drive.min_cgpa = float(request.form.get("min_cgpa", "").strip())
-        drive.deadline = request.form.get("deadline", "").strip()
+        drive.deadline = date.fromisoformat(request.form.get("deadline", "").strip())
         drive.required_skills = request.form.get("required_skills", "").strip()
         drive.experience_required = request.form.get("experience_required", "").strip()
         drive.salary_range = request.form.get("salary_range", "").strip()
